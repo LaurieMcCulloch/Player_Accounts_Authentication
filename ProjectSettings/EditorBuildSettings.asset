@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/SimplePlayerAccountLinking.unity
+    guid: 9f9c336de2a4643d8a6d2ac97c1acfc8
   m_configObjects: {}
