@@ -157,24 +157,28 @@ public class SimplePlayerAccountLinking : MonoBehaviour
     {
         // AUTHENTICATION SIGNED IN SUCCESSFULLY
         Debug.Log($"Authentication Service Signed In with PlayerID - {AuthenticationService.Instance.PlayerId}");
+        UpdateUI();
     }
 
     private void OnAuthSignedOut()
     {
         // AUTHENTICATION SIGNED OUT
-        Debug.Log("Authentication Service Signed Out"); 
+        Debug.Log("Authentication Service Signed Out");
+        UpdateUI();
     }
 
     private void OnAuthSignInFailed(RequestFailedException requestFailedException)
     {
         // AUTHENTICATION SIGNED IN FAILED
-        Debug.Log($"Authentication SignIn Failed : {requestFailedException.ErrorCode} : {requestFailedException.Message}"); 
+        Debug.Log($"Authentication SignIn Failed : {requestFailedException.ErrorCode} : {requestFailedException.Message}");
+        UpdateUI();
     }
 
     private void OnAuthSignInExpired()
     {
         // AUTHENTICATION TOKEN EXPIRED
-        Debug.Log("Authentication Service Token Expired");        
+        Debug.Log("Authentication Service Token Expired");
+        UpdateUI();
     }
     #endregion
 }
