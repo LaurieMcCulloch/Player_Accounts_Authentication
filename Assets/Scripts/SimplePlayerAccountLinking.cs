@@ -138,7 +138,8 @@ public class SimplePlayerAccountLinking : MonoBehaviour
     public async void PlayerName_Save_Button_Clicked() 
     { 
         // GET PLAYER NAME, TRIM TO 50 CHARS AND REPLACE ANY SPACES WITH '_'
-        string m_playerName = m_PlayerNameInput.text?.Replace(" ", "_").Truncate(50); 
+        string m_playerName = m_PlayerNameInput.text?.Replace(" ", "_"); 
+        m_playerName = m_playerName.Length > 50 ? m_playerName[..50] : m_playerName;
         Debug.Log($"Saving Player Name : {m_playerName}");
 
         if (AuthenticationService.Instance.IsSignedIn)
