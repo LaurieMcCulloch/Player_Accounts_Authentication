@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Unity.Services.Core;
 using Unity.Services.Authentication;
 using Unity.Services.PlayerAccounts;
+using Unity.VisualScripting;
 
 public class SimplePlayerAccountLinking : MonoBehaviour
 {
@@ -14,6 +15,10 @@ public class SimplePlayerAccountLinking : MonoBehaviour
     public Text m_Authenticated;
     [SerializeField]
     public Text m_PlayerID;
+    [SerializeField]
+    public InputField m_PlayerNameInput;
+    [SerializeField]
+    public Button m_PlayerNameSaveButton;   
     [SerializeField]
     public Button m_SignInButton;
     [SerializeField]
@@ -51,7 +56,6 @@ public class SimplePlayerAccountLinking : MonoBehaviour
         }
        
         Debug.Log($"Authentication Is Signed In : {AuthenticationService.Instance.IsSignedIn}");
-        UpdateUI();
     }
 
     private void Destory()
@@ -89,6 +93,13 @@ public class SimplePlayerAccountLinking : MonoBehaviour
         Debug.Log($"Player Account Linked : {isLinkedToPlayerAccounts}");
         m_LinkButton.interactable = !isLinkedToPlayerAccounts && isPlayerAccountSignedIn;
         m_UnLinkButton.interactable = isLinkedToPlayerAccounts;
+
+        // UPDATE PLAYER NAME FIELD
+        string playerName = await AuthenticationService.Instance.GetPlayerNameAsync(); 
+        Debug.Log($"Player Name read from Authentication Service : {playerName}"); 
+        // NOTE - REPLACING "_" with " " AND REMOVING THE NUMERICAL SUFFIX "#1234" TO IMPROVE READBILITY
+        // BEWARE IF YOU ALLOW PLAYERS TO SET NAMES WITH "_" OR "#" IN THEM!!!
+        m_PlayerNameInput.text = playerName?.Replace("_"," ").Split("#")[0] ;
     }
     #endregion
 
@@ -122,6 +133,18 @@ public class SimplePlayerAccountLinking : MonoBehaviour
         Debug.Log("UnLink Button Clicked");
         await AuthenticationService.Instance.UnlinkUnityAsync();
         UpdateUI();
+    }
+
+    public async void PlayerName_Save_Button_Clicked() 
+    { 
+        // GET PLAYER NAME, TRIM TO 50 CHARS AND REPLACE ANY SPACES WITH '_'
+        string m_playerName = m_PlayerNameInput.text?.Replace(" ", "_").Truncate(50); 
+        Debug.Log($"Saving Player Name : {m_playerName}");
+
+        if (AuthenticationService.Instance.IsSignedIn)
+        {           
+            await AuthenticationService.Instance.UpdatePlayerNameAsync(m_playerName);
+        }
     }
     #endregion
 
