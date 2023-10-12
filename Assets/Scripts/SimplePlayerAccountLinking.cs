@@ -48,13 +48,17 @@ public class SimplePlayerAccountLinking : MonoBehaviour
         AuthenticationService.Instance.SignInFailed += OnAuthSignInFailed;
         AuthenticationService.Instance.Expired += OnAuthSignInExpired;
 
-        // SIGN IN ANONYMOUSLY IF SESSION TOKEN EXISTS
-        if (AuthenticationService.Instance.SessionTokenExists)
+        // SIGN IN ANONYMOUSLY IF SESSION TOKEN EXISTS (FORCES PLAYER TO SIGN IN)
+        if (AuthenticationService.Instance.SessionTokenExists) // TODO ADD TOKEN EXPIRY HANDLING
         {
             Debug.Log("Authentication Session Token Exixts. Signing in anonymously...");
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
         }
-       
+
+        if (AuthenticationService.Instance.PlayerName == null)
+        {
+            Debug.Log("This must be a new player, their player name is NULL");
+        }
         Debug.Log($"Authentication Is Signed In : {AuthenticationService.Instance.IsSignedIn}");
     }
 
@@ -94,16 +98,40 @@ public class SimplePlayerAccountLinking : MonoBehaviour
         m_LinkButton.interactable = !isLinkedToPlayerAccounts && isPlayerAccountSignedIn;
         m_UnLinkButton.interactable = isLinkedToPlayerAccounts;
 
-        // UPDATE PLAYER NAME FIELD
-        string playerName = await AuthenticationService.Instance.GetPlayerNameAsync(); 
-        Debug.Log($"Player Name read from Authentication Service : {playerName}"); 
+        // UPDATE PLAYER NAME FIELD DISPLAY
+        string playerName = AuthenticationService.Instance.PlayerName;
+        if (playerName == null) 
+        {
+            playerName = GetPlayerNameFromPlayer(); // ALLOW USER TO PROVIDE THEIR OWN NAME
+            if (playerName != null)
+            {
+                // SAVE THE NAME PROVIDED BY THE PLAYER
+                await AuthenticationService.Instance.UpdatePlayerNameAsync(playerName);
+            }
+            else
+            {
+                // GENERATE RANDOM NAME IF PLAYER DIDN'T PROVIDE ONE
+                playerName = await AuthenticationService.Instance.GetPlayerNameAsync();
+            }
+        }
+
+        Debug.Log($"Player Name : {playerName}");
         // NOTE - REPLACING "_" with " " AND REMOVING THE NUMERICAL SUFFIX "#1234" TO IMPROVE READBILITY
         // BEWARE IF YOU ALLOW PLAYERS TO SET NAMES WITH "_" OR "#" IN THEM!!!
         m_PlayerNameInput.text = playerName?.Replace("_"," ").Split("#")[0] ;
     }
     #endregion
 
+    private string GetPlayerNameFromPlayer()
+    {
+        // GET NAME INPUT FROM PLAYER
 
+        // TEST BY COMMENTING IN/OUT ONE OF THESE LINES 
+        string playerName = null;
+        //string playerName = "New_Player";
+
+        return playerName;
+    }
     #region UI EVENT HANDLERS /////////////////////////////////////////////////////////////////////////////////////////////////////
     public async void SignIn_Button_Clicked()
     {
